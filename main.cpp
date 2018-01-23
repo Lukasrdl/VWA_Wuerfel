@@ -1,24 +1,24 @@
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /*															Vorwissenschaftliche Arbeit von Lukas Riedl															*/
-/*												Darstellung dreidimensionaler Objekte auf Flächen mithilfe von Dreiecken										*/
+/*												Darstellung dreidimensionaler Objekte auf FlÃ¤chen mithilfe von Dreiecken										*/
 /*																																								*/
-/*															Kapitel 5.1 Darstellung eines Würfels in OpenGL														*/
+/*															Kapitel 5.1 Darstellung eines WÃ¼rfels in OpenGL														*/
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /*																																								
 
-Folgendes Kapitel beschäftigt sich mit der Darstellung eines dreidimensionalen Würfels in OpenGL. Dafür richte ich mich nach einem etablierten Schema.
-Für die Behandlung des gestellten Problems werden folgende Schritte benötigt[1]:
+Folgendes Kapitel beschÃ¤ftigt sich mit der Darstellung eines dreidimensionalen WÃ¼rfels in OpenGL. DafÃ¼r richte ich mich nach einem etablierten Schema.
+FÃ¼r die Behandlung des gestellten Problems werden folgende Schritte benÃ¶tigt[1]:
 
-	1. Definieren der benötigten mathematischen Strukturen wie Vektoren und Matrizen und deren Operationen, wie sie im Theorieteil dieser Arbeit besprochen wurden
-	2. Definieren der benötigten Punkte im dreidimensionalen Raum
-	3. Festlegung von Indizes, welche mit den in Schritt 2 definierten Punkten multipliziert werden, um die Reihenfolge der Punkte felstlegen, wie sie für die Darstellung eines Würfels benötigt werden
+	1. Definieren der benÃ¶tigten mathematischen Strukturen wie Vektoren und Matrizen und deren Operationen, wie sie im Theorieteil dieser Arbeit besprochen wurden
+	2. Definieren der benÃ¶tigten Punkte im dreidimensionalen Raum
+	3. Festlegung von Indizes, welche mit den in Schritt 2 definierten Punkten multipliziert werden, um die Reihenfolge der Punkte felstlegen, wie sie fÃ¼r die Darstellung eines WÃ¼rfels benÃ¶tigt werden
 	4. OpenGL Vorbereitungen und Buffer
 	5. Durchlaufen der Grafikpipeline
 	6. Einbinden eines Shaders
 	7. Game-Loop und das Schicken der Daten an OpenGL und das damit verbundene Darstellen auf einem Bildschirm
 
 
-Ich beschränke das Kommentieren des Codes nicht nur auf die in der Arbeit direkt angesprochenen Abschnitte, sondern auch um andere wichtige Schritte, welche in OpenGL erfüllt werden müssen, 
+Ich beschrÃ¤nke das Kommentieren des Codes nicht nur auf die in der Arbeit direkt angesprochenen Abschnitte, sondern auch um andere wichtige Schritte, welche in OpenGL erfÃ¼llt werden mÃ¼ssen, 
 um ein korrektes Ergebnis zu erhalten.
 
 */
@@ -26,7 +26,7 @@ um ein korrektes Ergebnis zu erhalten.
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 /*																		Anfang des Programms																	*/
-/*														  Einbinden der benötigten Header und Bibliotheken														*/
+/*														  Einbinden der benÃ¶tigten Header und Bibliotheken														*/
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 
@@ -45,7 +45,7 @@ um ein korrektes Ergebnis zu erhalten.
 
 
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
-/*											1. Definieren von Strukturen zu generieren der benötigten Objekte (Matrix, Vektor)	[2]								*/
+/*											1. Definieren von Strukturen zu generieren der benÃ¶tigten Objekte (Matrix, Vektor)	[2]								*/
 /*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 
@@ -78,7 +78,7 @@ struct mat4 {
 
 // Konstuktoren der Matrizen
 mat4::mat4() {
-	// Identitätsmatrix
+	// IdentitÃ¤tsmatrix
 	e[0] = 1;
 	e[5] = 1;
 	e[10] = 1;
@@ -120,7 +120,7 @@ int main() {
 	/*---------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
 
-	// Die Daten für die Eckpunkte eines Würfels mit der Seitenlänge 1 werden in einem GLfloat (entspricht float) Array gespeichert
+	// Die Daten fÃ¼r die Eckpunkte eines WÃ¼rfels mit der SeitenlÃ¤nge 1 werden in einem GLfloat (entspricht float) Array gespeichert
 	GLfloat punkte[] = {
 		-0.5f, -0.5f, -0.5f, // unten vorne rechts
 		-0.5f, -0.5f, 0.5f,  // unten hinten rechts
@@ -133,9 +133,9 @@ int main() {
 		0.5f, 0.5f, 0.5f,	 // oben hinten links
 	};
 
-	// Ein Index repräsentiert 3 aufeinanderfolgende Dezimalzahlen (3 * n, 3 * n + 1, 3 * n + 2) und somit einen vollständigen Eckpunkt
+	// Ein Index reprÃ¤sentiert 3 aufeinanderfolgende Dezimalzahlen (3 * n, 3 * n + 1, 3 * n + 2) und somit einen vollstÃ¤ndigen Eckpunkt
 	GLuint indexe[] = {
-		// Zwei Dreiecke für die obere Seite
+		// Zwei Dreiecke fÃ¼r die obere Seite
 		4, 
 		5, 
 		6, 
@@ -144,7 +144,7 @@ int main() {
 		6, 
 		7,
 
-		// Zwei Dreiecke für die rechte Seite
+		// Zwei Dreiecke fÃ¼r die rechte Seite
 		0,
 		1,
 		4,
@@ -153,7 +153,7 @@ int main() {
 		4,
 		5,
 
-		// Zwei Dreiecke für die hintere Seite
+		// Zwei Dreiecke fÃ¼r die hintere Seite
 		1,
 		3,
 		5,
@@ -162,7 +162,7 @@ int main() {
 		5,
 		7,
 
-		// Zwei Dreiecke für die linke Seite
+		// Zwei Dreiecke fÃ¼r die linke Seite
 		2,
 		3,
 		6,
@@ -171,7 +171,7 @@ int main() {
 		6,
 		7,
 
-		// Zwei Dreiecke für die untere Seite
+		// Zwei Dreiecke fÃ¼r die untere Seite
 		0,
 		1,
 		2,
@@ -180,7 +180,7 @@ int main() {
 		3,
 		4,
 
-		// Zwei Dreiecke für die vordere Seite
+		// Zwei Dreiecke fÃ¼r die vordere Seite
 		0,
 		2,
 		4,
@@ -202,13 +202,13 @@ int main() {
 	// Erstellen eines 640x480 Fensters
 	GLFWwindow *window = glfwCreateWindow(640, 480, "Wuerfel in OpenGL 4", NULL, NULL);
 
-	// Das Fenster "aktiv" stellen um es modifizieren zu können
+	// Das Fenster "aktiv" stellen um es modifizieren zu kÃ¶nnen
 	glfwMakeContextCurrent(window);
 
 	// Initialisieren von GLEW
 	glewInit();
 
-	// GLEW Extension Handler (Kümmert sich automatisch um die optionale Erweiterungen von GLEW)
+	// GLEW Extension Handler (KÃ¼mmert sich automatisch um die optionale Erweiterungen von GLEW)
 	glewExperimental = GL_TRUE;
 
 	// Ausgabe der aktuellen OpenGL Version
@@ -222,7 +222,7 @@ int main() {
 
 	// Erstellen eines VBOs ("Vertex Buffer Object", welcher Daten in einem Array gespeichert. 
 	
-	// Generieren des VBOs, welches später die Punkte speichern soll.
+	// Generieren des VBOs, welches spÃ¤ter die Punkte speichern soll.
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	// Durch das Binden eines Buffers setzt man diesen "aktiv"
@@ -230,7 +230,7 @@ int main() {
 	// Kopieren der Punkte in den eben erstellten Buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(punkte), &punkte, GL_STATIC_DRAW);
 
-	// Ein VAO ("Vertex Attribute Buffer"). Dieses Objekt speichert die Adresse von VBOs, um auf diese referenzieren zu können
+	// Ein VAO ("Vertex Attribute Buffer"). Dieses Objekt speichert die Adresse von VBOs, um auf diese referenzieren zu kÃ¶nnen
 
 	// Erstellen des VAOs
 	GLuint vao;
@@ -238,13 +238,13 @@ int main() {
 	glBindVertexArray(vao);
 	// Binden des VAOs
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	// Das Layout der Daten wird dem VAO übergeben, Attribut Nr. 0
+	// Das Layout der Daten wird dem VAO Ã¼bergeben, Attribut Nr. 0
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	// Aktivierung des 0ten Attributs
 	glEnableVertexAttribArray(0);
 
 	// Ein Index Buffer wird dazu verwendet um auf Daten zuzugreifen und wird auch in einem VBO gespeichert.
-	// Er wird hauptsächlich dafür verwendet, dass man jeden Punkt nur ein Mal definieren muss und ihn dann mehrmals ansprechen kann
+	// Er wird hauptsÃ¤chlich dafÃ¼r verwendet, dass man jeden Punkt nur ein Mal definieren muss und ihn dann mehrmals ansprechen kann
 
 	// Erstellen eines Index Buffers
 	GLuint index_vbo;
@@ -262,9 +262,9 @@ int main() {
 
 	/* ----- Erstellen der View Matrix ----- */
 
-	// Position der Kamera, bei (0|0|0) wird der Würfel gezeichnet
+	// Position der Kamera; bei (0|0|1) wird der WÃ¼rfel gezeichnet
 	float kamera_position[] = { 0.0f, 0.0f, 1.0f };
-	// Rotation der Kamera um den Würfel in verschiedenen Winkeln anzusehen
+	// Rotation der Kamera um den WÃ¼rfel in verschiedenen Winkeln anzusehen
 	float kamera_rotiert = 0.0f;
 
 	// Erstellen einer Transformations-Matrix
@@ -297,9 +297,9 @@ int main() {
 
 	/* ----- Erstellen der Projection Matrix ----- */
 
-	// Definieren der benötigte Daten
-	float naheEbene = 0.1f;
-	float ferneEbene = 1000.0f;
+	// Definieren der benÃ¶tigte Daten
+	float naheEbene = 1.0f;
+	float ferneEbene = 100.0f;
 	float sv = (float)640 / (float)480;
 	// Field of View in Radiant
 	float fov = 90.0 * (3.14159265359 / 180.0);
@@ -309,9 +309,9 @@ int main() {
 	mat4 proj_mat;
 	proj_mat.e[0] = 1 / (sv * tan(fov / 2));
 	proj_mat.e[5] = d;
-	proj_mat.e[10] = -(naheEbene -ferneEbene ) / (naheEbene - ferneEbene);
-	proj_mat.e[11] = -(2.0f * ferneEbene * naheEbene) / (naheEbene - ferneEbene);
-	proj_mat.e[14] = -1.0f;
+	proj_mat.e[10] = (-naheEbene - ferneEbene) / (naheEbene - ferneEbene);
+	proj_mat.e[11] = (2.0f * ferneEbene * naheEbene) / (naheEbene - ferneEbene);
+	proj_mat.e[14] = 1.0f;
 
 
 	/*--------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -323,7 +323,7 @@ int main() {
 	std::ifstream vertex_shader_file;
 	std::ifstream fragment_shader_file;
 
-	// Öffnen der Shader-Dateien
+	// Ã–ffnen der Shader-Dateien
 	vertex_shader_file.open("shad.vert");
 	fragment_shader_file.open("shad.frag");
 
@@ -361,11 +361,11 @@ int main() {
 	// Compilieren des Vertex Shaders
 	glCompileShader(vertex_shader);
 
-	// Hinzufügen des Shaders an das Programm
+	// HinzufÃ¼gen des Shaders an das Programm
 	glAttachShader(shader_program, vertex_shader);
 
 
-	// Erstellen eines Fragment Shaders, welcher für Farben und Licht zuständig ist (siehe file.frag)
+	// Erstellen eines Fragment Shaders, welcher fÃ¼r Farben und Licht zustÃ¤ndig ist (siehe file.frag)
 	GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
 	// Zuweisung der Daten an den Fragment Shader
@@ -374,7 +374,7 @@ int main() {
 	// Compilieren des Fragment Shaders
 	glCompileShader(fragment_shader);
 
-	// Hinzufügen des Shaders an das Programm
+	// HinzufÃ¼gen des Shaders an das Programm
 	glAttachShader(shader_program, fragment_shader);
 
 
@@ -384,8 +384,8 @@ int main() {
 	// Programm in den Fukus bringen
 	glUseProgram(shader_program);
 
-	// Erstellen von zwei "Uniforms", mit welchen Shader Daten modifiziert und ausgetauscht werden können
-	// Eine Variable für die View- und eine für die Projektionsmatrix
+	// Erstellen von zwei "Uniforms", mit welchen Shader Daten modifiziert und ausgetauscht werden kÃ¶nnen
+	// Eine Variable fÃ¼r die View- und eine fÃ¼r die Projektionsmatrix
 	GLint view_mat_location = glGetUniformLocation(shader_program, "view");
 	GLint prog_mat_location = glGetUniformLocation(shader_program, "proj");
 	
@@ -404,7 +404,7 @@ int main() {
 		glClearColor(0.3f, 0.3f, 0.9f, 1.0f);
 		// Leeren einiger Bits
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Verbinden der Punkte nur mit Linien, nicht mit Flächen [3]
+		// Verbinden der Punkte nur mit Linien, nicht mit FlÃ¤chen [3]
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// Setzen des Bildschirmes
@@ -412,13 +412,13 @@ int main() {
 
 		// Aktivierung der "Tiefentestung" [4]
 		glEnable(GL_DEPTH_TEST);
-		// Nur die näheste Fläche soll dargestellt werden, andere Fragmente werden verworfen
+		// Nur die nÃ¤heste FlÃ¤che soll dargestellt werden, andere Fragmente werden verworfen
 		glDepthFunc(GL_LESS);
 
 		// Zeichnen von 12 bzw. (36 / 3) Punkten
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, NULL);
 
-		// GLFW Überprüfungen
+		// GLFW ÃœberprÃ¼fungen
 		glfwPollEvents();
 		// Der Framebuffer[5] (Bildspeicher) muss gewechselt werden 
 		glfwSwapBuffers(window);
@@ -433,19 +433,19 @@ int main() {
 
 
 /*
-	Fußnoten
+	FuÃŸnoten
 
-	[1] Der gesamt Ablauf der OpenGL-Funktionsaufrufe in diesem Programm basiert auf den Erklärungen aus dem Buch "Anton's OpenGL 4 turorials"
+	[1] Der gesamt Ablauf der OpenGL-Funktionsaufrufe in diesem Programm basiert auf den ErklÃ¤rungen aus dem Buch "Anton's OpenGL 4 turorials"
 	
-	[2] Die Idee Strukturen für Vektoren und andere Objekte zu benutzen ist sehr gängig. Eine Andere Möglichkeit wäre eine weitere Bibliothek, welche diese Strukturen verwaltet
-		und meist auch rechnerische Operatoren zur Verfügung stellt. Aus Darstellungszwecken habe ich jedoch von so einer Bibliothek abgelassen.
+	[2] Die Idee Strukturen fÃ¼r Vektoren und andere Objekte zu benutzen ist sehr gÃ¤ngig. Eine Andere MÃ¶glichkeit wÃ¤re eine weitere Bibliothek, welche diese Strukturen verwaltet
+		und meist auch rechnerische Operatoren zur VerfÃ¼gung stellt. Aus Darstellungszwecken habe ich jedoch von so einer Bibliothek abgelassen.
 
-	[3] Diese Einstellung ist für Demonstrationszwecke gedacht. Sie ist jedoch nicht für ein laufendes Programm nötig.
+	[3] Diese Einstellung ist fÃ¼r Demonstrationszwecke gedacht. Sie ist jedoch nicht fÃ¼r ein laufendes Programm nÃ¶tig.
 
-	[4] Depth Testing (dt. Tiefentestung) beschreibt den Vorgang der Verglichung der z-Komponenten, welche an der gleichen Stelle dargestelt werden müssten
+	[4] Depth Testing (dt. Tiefentestung) beschreibt den Vorgang der Verglichung der z-Komponenten, welche an der gleichen Stelle dargestelt werden mÃ¼ssten
 
-	[5] Der Framebuffer ermöglicht das Konzept der sogenannten Doppelpufferung. Dabei werden in einen Buffer die momentanen Bildinformaitonen gespeichert, während der andere, 
-		welche schon im Frame davor gespeichert wurde, von OpenGL gezeichnet wird. Dies verringert die Möglichkeit, dass noch nicht zur Gänze gespeicherte Frames auf dem Bildschirm gezeichnet werden,
-		da für die Speicherung immer doppelt so viel Zeit vorhanden ist.
+	[5] Der Framebuffer ermÃ¶glicht das Konzept der sogenannten Doppelpufferung. Dabei werden in einen Buffer die momentanen Bildinformaitonen gespeichert, wÃ¤hrend der andere, 
+		welche schon im Frame davor gespeichert wurde, von OpenGL gezeichnet wird. Dies verringert die MÃ¶glichkeit, dass noch nicht zur GÃ¤nze gespeicherte Frames auf dem Bildschirm gezeichnet werden,
+		da fÃ¼r die Speicherung immer doppelt so viel Zeit vorhanden ist.
 
 */
